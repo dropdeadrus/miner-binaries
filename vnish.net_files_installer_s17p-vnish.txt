@@ -1,0 +1,28 @@
+cd /dev
+mkdir fw
+cd fw
+curl -fkSL https://github.com/dropdeadrus/miner-binaries/raw/master/Antminer-S17-user-OM-202004271323-ssh_nosig_5835.tar.gz -o WEB.tar.gz
+tar xvzf WEB.tar.gz
+tar xvzf fw.tar.gz
+
+path=/dev/fw
+
+if [ -L /config/dropbear ] ; then
+    rm -r /config/dropbear
+fi
+
+if [ -e uramdisk.image.gz ]; then
+
+	/usr/sbin/flash_erase /dev/mtd1 0x0 0x100
+	/usr/sbin/nandwrite -p -s 0x0 /dev/mtd1 uramdisk.image.gz
+	if [ -e /dev/mtd4 ]; then
+		/usr/sbin/flash_erase /dev/mtd4 0x0 0x100
+		/usr/sbin/nandwrite -p -s 0x0 /dev/mtd4 uramdisk.image.gz
+	fi
+fi
+
+rm -rf /config/scanfreqdone 2
+
+sync
+
+/sbin/reboot
